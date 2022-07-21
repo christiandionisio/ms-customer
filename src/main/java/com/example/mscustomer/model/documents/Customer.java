@@ -10,12 +10,11 @@ import java.util.Date;
 @Document(collection="customers")
 public class Customer {
     @Id
-    private String customer_id;
-
+    private String customerId;
     private String name;
-    private String last_name;
+    private String lastName;
     private String email ;
-    private String document_type;
-    private String document_number;
-    private Date birth_date;
+    private String documentType;
+    private String documentNumber;
+    private Date birthDate;
 }
