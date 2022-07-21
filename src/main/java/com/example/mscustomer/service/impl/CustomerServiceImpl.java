@@ -25,12 +25,17 @@ public class CustomerServiceImpl implements CustomerService {
     }
 
     @Override
-    public Mono<Customer> save(Customer curso) {
-        return customerDao.save(curso);
+    public Mono<Customer> create(Customer customer) {
+        return customerDao.save(customer);
     }
 
     @Override
-    public Mono<Void> deleteById(String id) {
+    public Mono<Customer> update(Customer customer) {
+        return customerDao.save(customer);
+    }
+
+    @Override
+    public Mono<Void> delete(String id) {
         return customerDao.deleteById(id);
     }
 }

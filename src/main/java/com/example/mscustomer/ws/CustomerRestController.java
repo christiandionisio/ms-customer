@@ -18,7 +18,7 @@ public class CustomerRestController {
     private static final Logger logger = LogManager.getLogger(CustomerRestController.class);
 
     @GetMapping("/customers")
-    public Flux<Customer> getCustomers(){
+    public Flux<Customer> findAll(){
         logger.debug("Debugging log");
         logger.info("Info log");
         logger.warn("Hey, This is a warning!");
@@ -29,26 +29,26 @@ public class CustomerRestController {
     }
 
     @GetMapping("/customers/{id}")
-    public Mono<Customer> getCustomer(@PathVariable String id){
+    public Mono<Customer> read(@PathVariable String id){
         Mono<Customer> customer = customerService.findById(id);
         return customer;
     }
 
     @PostMapping("/customers")
-    public Mono<Customer> saveCustomer(@RequestBody Customer customer){
-        Mono<Customer> newCustomer = customerService.save(customer);
+    public Mono<Customer> create(@RequestBody Customer customer){
+        Mono<Customer> newCustomer = customerService.create(customer);
         return newCustomer;
     }
 
     @PutMapping("/customers")
-    public Mono<Customer> updateCustomer(@RequestBody Customer customer){
-        Mono<Customer> customerUpdated = customerService.save(customer);
+    public Mono<Customer> update(@RequestBody Customer customer){
+        Mono<Customer> customerUpdated = customerService.update(customer);
         return customerUpdated;
     }
 
     @DeleteMapping("/customers/{id}")
-    public Mono<Void> deleteCustomer(@PathVariable String id){
-        Mono<Void> customer = customerService.deleteById(id);
+    public Mono<Void> delete(@PathVariable String id){
+        Mono<Void> customer = customerService.delete(id);
         return customer;
     }
 }
