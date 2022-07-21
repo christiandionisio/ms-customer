@@ -2,6 +2,8 @@ package com.example.mscustomer.ws;
 
 import com.example.mscustomer.model.documents.Customer;
 import com.example.mscustomer.service.CustomerService;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
@@ -13,8 +15,15 @@ public class CustomerRestController {
     @Autowired
     private CustomerService customerService;
 
+    private static final Logger logger = LogManager.getLogger(CustomerRestController.class);
+
     @GetMapping("/customers")
     public Flux<Customer> getCustomers(){
+        logger.debug("Debugging log");
+        logger.info("Info log");
+        logger.warn("Hey, This is a warning!");
+        logger.error("Oops! We have an Error. OK");
+        logger.fatal("Damn! Fatal error. Please fix me.");
         Flux<Customer> customerList = customerService.findAll();
         return customerList;
     }
