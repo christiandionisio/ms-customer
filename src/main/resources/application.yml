@@ -1,0 +1,15 @@
+spring:
+  application:
+    name: ms-customer
+  data:
+    mongodb:
+      uri: mongodb://localhost:27017/ms-customer
+
+server:
+  port: 8082
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "*"
