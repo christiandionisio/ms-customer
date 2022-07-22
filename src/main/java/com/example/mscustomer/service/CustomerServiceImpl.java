@@ -1,8 +1,7 @@
-package com.example.mscustomer.service.impl;
+package com.example.mscustomer.service;
 
-import com.example.mscustomer.model.daos.CustomerDao;
-import com.example.mscustomer.model.documents.Customer;
-import com.example.mscustomer.service.CustomerService;
+import com.example.mscustomer.repository.CustomerRepository;
+import com.example.mscustomer.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Flux;
@@ -12,7 +11,7 @@ import reactor.core.publisher.Mono;
 public class CustomerServiceImpl implements CustomerService {
 
     @Autowired
-    private CustomerDao customerDao;
+    private CustomerRepository customerDao;
 
     @Override
     public Flux<Customer> findAll() {

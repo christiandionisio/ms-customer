@@ -1,4 +1,4 @@
-package com.example.mscustomer.model.documents;
+package com.example.mscustomer.model;
 
 import lombok.Data;
 import org.springframework.data.annotation.Id;

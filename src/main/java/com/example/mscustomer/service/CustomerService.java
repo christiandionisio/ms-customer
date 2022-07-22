@@ -1,7 +1,7 @@
 package com.example.mscustomer.service;
 
 
-import com.example.mscustomer.model.documents.Customer;
+import com.example.mscustomer.model.Customer;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 

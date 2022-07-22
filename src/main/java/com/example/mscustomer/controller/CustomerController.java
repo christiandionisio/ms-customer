@@ -1,6 +1,6 @@
-package com.example.mscustomer.ws;
+package com.example.mscustomer.controller;
 
-import com.example.mscustomer.model.documents.Customer;
+import com.example.mscustomer.model.Customer;
 import com.example.mscustomer.service.CustomerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -11,26 +11,22 @@ import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
 
 @RestController
-@RequestMapping("/api")
-public class CustomerRestController {
+@RequestMapping("/customers")
+public class CustomerController {
     @Autowired
     private CustomerService customerService;
-
-
     @Value("${owner.name}")
     String name;
-
     @Value("${server.port}")
     String port;
-
-    private static final Logger logger = LogManager.getLogger(CustomerRestController.class);
+    private static final Logger logger = LogManager.getLogger(CustomerController.class);
 
     @GetMapping("/status/check")
     public String status() {
         return "Working on port " + port + " with owner_name " + name;
     }
 
-    @GetMapping("/customers")
+    @GetMapping
     public Flux<Customer> findAll(){
         logger.debug("Debugging log");
         logger.info("Info log");
@@ -41,25 +37,25 @@ public class CustomerRestController {
         return customerList;
     }
 
-    @GetMapping("/customers/{id}")
+    @GetMapping("/{id}")
     public Mono<Customer> read(@PathVariable String id){
         Mono<Customer> customer = customerService.findById(id);
         return customer;
     }
 
-    @PostMapping("/customers")
+    @PostMapping
     public Mono<Customer> create(@RequestBody Customer customer){
         Mono<Customer> newCustomer = customerService.create(customer);
         return newCustomer;
     }
 
-    @PutMapping("/customers")
+    @PutMapping
     public Mono<Customer> update(@RequestBody Customer customer){
         Mono<Customer> customerUpdated = customerService.update(customer);
         return customerUpdated;
     }
 
-    @DeleteMapping("/customers/{id}")
+    @DeleteMapping("/{id}")
     public Mono<Void> delete(@PathVariable String id){
         Mono<Void> customer = customerService.delete(id);
         return customer;
