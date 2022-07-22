@@ -5,6 +5,7 @@ import com.example.mscustomer.service.CustomerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -15,7 +16,19 @@ public class CustomerRestController {
     @Autowired
     private CustomerService customerService;
 
+
+    @Value("${owner.name}")
+    String name;
+
+    @Value("${server.port}")
+    String port;
+
     private static final Logger logger = LogManager.getLogger(CustomerRestController.class);
+
+    @GetMapping("/status/check")
+    public String status() {
+        return "Working on port " + port + " with owner_name " + name;
+    }
 
     @GetMapping("/customers")
     public Flux<Customer> findAll(){

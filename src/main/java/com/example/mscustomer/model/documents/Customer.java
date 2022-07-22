@@ -17,4 +17,5 @@ public class Customer {
     private String documentType;
     private String documentNumber;
     private Date birthDate;
+    private String customerType;
 }
