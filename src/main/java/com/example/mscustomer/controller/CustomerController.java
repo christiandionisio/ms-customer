@@ -6,9 +6,15 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
+
+import java.net.URI;
 
 @RestController
 @RequestMapping("/customers")
@@ -44,9 +50,12 @@ public class CustomerController {
     }
 
     @PostMapping
-    public Mono<Customer> create(@RequestBody Customer customer){
-        Mono<Customer> newCustomer = customerService.create(customer);
-        return newCustomer;
+    public Mono<ResponseEntity<Customer>> create(@RequestBody Customer customer, final ServerHttpRequest req){
+        return customerService.create(customer)
+                .flatMap(c -> Mono.just(ResponseEntity.created(URI.create(req.getURI().toString().concat("/").concat(c.getCustomerId())))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .body(c)))
+                .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
     @PutMapping
