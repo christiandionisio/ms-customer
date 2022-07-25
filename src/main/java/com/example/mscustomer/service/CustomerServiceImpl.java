@@ -1,5 +1,7 @@
 package com.example.mscustomer.service;
 
+import com.example.mscustomer.enums.CustomerTypeEnum;
+import com.example.mscustomer.error.InvalidCustomerTypeException;
 import com.example.mscustomer.repository.CustomerRepository;
 import com.example.mscustomer.model.Customer;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +27,11 @@ public class CustomerServiceImpl implements CustomerService {
 
     @Override
     public Mono<Customer> create(Customer customer) {
-        return customerDao.save(customer);
+        if(customer.getCustomerType().equals(CustomerTypeEnum.BUSINESS.getValue()) || customer.getCustomerType().equals(CustomerTypeEnum.PERSONNEL.getValue())){
+            return customerDao.save(customer);
+        }else{
+            return Mono.error(new InvalidCustomerTypeException());
+        }
     }
 
     @Override

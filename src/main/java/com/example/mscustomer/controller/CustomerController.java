@@ -1,5 +1,6 @@
 package com.example.mscustomer.controller;
 
+import com.example.mscustomer.error.InvalidCustomerTypeException;
 import com.example.mscustomer.model.Customer;
 import com.example.mscustomer.service.CustomerService;
 import org.apache.logging.log4j.LogManager;
@@ -9,7 +10,6 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.server.ServerHttpRequest;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Flux;
 import reactor.core.publisher.Mono;
@@ -50,11 +50,17 @@ public class CustomerController {
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Customer>> create(@RequestBody Customer customer, final ServerHttpRequest req){
+    public Mono<ResponseEntity<Customer>> create(@RequestBody Customer customer){
         return customerService.create(customer)
-                .flatMap(c -> Mono.just(ResponseEntity.created(URI.create(req.getURI().toString().concat("/").concat(c.getCustomerId())))
+                .flatMap(c -> Mono.just(ResponseEntity.created(URI.create("http://localhost:8082/customers".concat("/").concat(c.getCustomerId())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(c)))
+                .onErrorResume(e -> {
+                    if (e instanceof InvalidCustomerTypeException) {
+                        return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
+                    }
+                    return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
+                })
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 

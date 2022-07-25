@@ -1,14 +1,14 @@
 package com.example.mscustomer.enums;
 
 public enum CustomerTypeEnum {
-    PERSONNEL("PERSONAL"),
+    PERSONNEL("PERSONNEL"),
     BUSINESS("BUSINESS");
-    private String customerType;
-    CustomerTypeEnum(String customerType){
-        this.customerType = customerType;
+    private String value;
+    CustomerTypeEnum(String value){
+        this.value = value;
     }
 
-    public String getCustomerType(){
-        return customerType;
+    public String getValue(){
+        return value;
     }
 }
