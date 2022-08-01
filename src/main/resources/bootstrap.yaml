@@ -4,23 +4,14 @@ spring:
   data:
     mongodb:
       uri: "mongodb+srv://mean_user:EWpWinEnfJ2nc32R@cluster0.hcqaq.mongodb.net/customerDB?authSource=admin&replicaSet=atlas-m2z4np-shard-0&readPreference=primary&ssl=true"
+  cloud:
+    config:
+      name: ms-customer
+      discovery:
+        enabled: true
+        service-id: ms-config-server
 
 server:
   port: 8082
-
-management:
-  endpoints:
-    web:
-      exposure:
-        include: "*"
-
-eureka:
-  client:
-    register-with-eureka: true
-    fetch-registry: true
-    service-url:
-      defaultZone: http://localhost:8761/eureka/
-  instance:
-    hostname: localhost
 owner:
   name: Alisson
