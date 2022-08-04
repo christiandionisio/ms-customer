@@ -1,10 +1,13 @@
 package com.example.mscustomer.controller;
 
+import com.example.mscustomer.dto.CustomerDTO;
 import com.example.mscustomer.error.InvalidCustomerTypeException;
 import com.example.mscustomer.model.Customer;
 import com.example.mscustomer.service.CustomerService;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
+import org.modelmapper.ModelMapper;
+import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
@@ -27,6 +30,8 @@ public class CustomerController {
     String port;
     private static final Logger logger = LogManager.getLogger(CustomerController.class);
 
+    private ModelMapper modelMapper = new ModelMapper();
+
     @GetMapping("/status/check")
     public String status() {
         return "Working on port " + port + " with owner_name " + name;
@@ -39,19 +44,18 @@ public class CustomerController {
         logger.warn("Hey, This is a warning!");
         logger.error("Oops! We have an Error. OK");
         logger.fatal("Damn! Fatal error. Please fix me.");
-        Flux<Customer> customerList = customerService.findAll();
-        return customerList;
+        return customerService.findAll();
     }
 
     @GetMapping("/{id}")
     public Mono<Customer> read(@PathVariable String id){
-        Mono<Customer> customer = customerService.findById(id);
-        return customer;
+        return customerService.findById(id);
     }
 
     @PostMapping
-    public Mono<ResponseEntity<Customer>> create(@RequestBody Customer customer){
-        return customerService.create(customer)
+    public Mono<ResponseEntity<Customer>> create(@RequestBody CustomerDTO customerDTO){
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return customerService.create(modelMapper.map(customerDTO, Customer.class))
                 .flatMap(c -> Mono.just(ResponseEntity.created(URI.create("http://localhost:8082/customers".concat("/").concat(c.getCustomerId())))
                         .contentType(MediaType.APPLICATION_JSON)
                         .body(c)))
@@ -65,14 +69,13 @@ public class CustomerController {
     }
 
     @PutMapping
-    public Mono<Customer> update(@RequestBody Customer customer){
-        Mono<Customer> customerUpdated = customerService.update(customer);
-        return customerUpdated;
+    public Mono<Customer> update(@RequestBody CustomerDTO customerDTO){
+        modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
+        return customerService.update(modelMapper.map(customerDTO, Customer.class));
     }
 
     @DeleteMapping("/{id}")
     public Mono<Void> delete(@PathVariable String id){
-        Mono<Void> customer = customerService.delete(id);
-        return customer;
+        return customerService.delete(id);
     }
 }
