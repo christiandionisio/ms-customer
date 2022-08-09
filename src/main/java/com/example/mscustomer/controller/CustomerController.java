@@ -65,20 +65,6 @@ public class CustomerController {
   }
 
   /**
-   * Get detail of a customer by Id.
-   *
-   * @author Alisson Arteaga / Christian Dionisio
-   * @version 1.0
-   */
-  @GetMapping("/{id}")
-  public Mono<ResponseEntity<Customer>> read(@PathVariable String id) {
-    return customerService.findById(id).map(customer -> ResponseEntity.ok()
-                    .contentType(MediaType.APPLICATION_JSON_UTF8)
-                    .body(customer))
-            .defaultIfEmpty(ResponseEntity.notFound().build());
-  }
-
-  /**
    * Create a Customer.
    *
    * @author Alisson Arteaga / Christian Dionisio
@@ -93,11 +79,27 @@ public class CustomerController {
                     .body(c)))
             .onErrorResume(e -> {
               if (e instanceof InvalidCustomerTypeException) {
+                logger.error(e.getMessage());
                 return Mono.just(new ResponseEntity<>(HttpStatus.BAD_REQUEST));
               }
+              logger.error(e.getMessage());
               return Mono.just(new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR));
             })
             .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
+  }
+
+  /**
+   * Get detail of a customer by Id.
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
+  @GetMapping("/{id}")
+  public Mono<ResponseEntity<Customer>> read(@PathVariable String id) {
+    return customerService.findById(id).map(customer -> ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
+                    .body(customer))
+            .defaultIfEmpty(ResponseEntity.notFound().build());
   }
 
   /**
@@ -119,7 +121,7 @@ public class CustomerController {
       c.setCategory(customerDto.getCategory());
       return customerService.update(c);
     }).map(customerUpdated -> ResponseEntity
-                    .created(URI.create("/api/productos/".concat(customerUpdated.getCustomerId())))
+                    .created(URI.create("/customers/".concat(customerUpdated.getCustomerId())))
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .body(customerUpdated))
             .defaultIfEmpty(ResponseEntity.notFound().build());
@@ -133,9 +135,9 @@ public class CustomerController {
    */
   @DeleteMapping("/{id}")
   public Mono<ResponseEntity<Void>> delete(@PathVariable String id) {
-    return customerService.findById(id).flatMap(customer -> {
-      return customerService.delete(customer.getCustomerId())
-              .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)));
-    }).defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
+    return customerService.findById(id)
+            .flatMap(customer -> customerService.delete(customer.getCustomerId())
+              .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT))))
+            .defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
   }
 }
