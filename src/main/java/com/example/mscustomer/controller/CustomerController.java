@@ -33,20 +33,24 @@ public class CustomerController {
     }
 
     @GetMapping
-    public Flux<Customer> findAll(){
+    public Mono<ResponseEntity<Flux<Customer>>> findAll(){
         logger.debug("Debugging log");
         logger.info("Info log");
         logger.warn("Hey, This is a warning!");
         logger.error("Oops! We have an Error. OK");
         logger.fatal("Damn! Fatal error. Please fix me.");
-        Flux<Customer> customerList = customerService.findAll();
-        return customerList;
+        return Mono.just(
+                ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .body(customerService.findAll()));
     }
 
     @GetMapping("/{id}")
-    public Mono<Customer> read(@PathVariable String id){
-        Mono<Customer> customer = customerService.findById(id);
-        return customer;
+    public Mono<ResponseEntity<Customer>> read(@PathVariable String id){
+        return customerService.findById(id).map(customer -> ResponseEntity.ok()
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .body(customer))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
 
     @PostMapping
@@ -64,15 +68,26 @@ public class CustomerController {
                 .defaultIfEmpty(ResponseEntity.status(HttpStatus.NOT_FOUND).build());
     }
 
-    @PutMapping
-    public Mono<Customer> update(@RequestBody Customer customer){
-        Mono<Customer> customerUpdated = customerService.update(customer);
-        return customerUpdated;
+    @PutMapping("/{id}")
+    public Mono<ResponseEntity<Customer>> update(@RequestBody Customer customer, @PathVariable String id){
+        return customerService.findById(id).flatMap(c -> {
+                    c.setName(customer.getName());
+                    c.setLastName(customer.getLastName());
+                    c.setEmail(customer.getEmail());
+                    c.setDocumentType(customer.getDocumentType());
+                    c.setDocumentNumber(customer.getDocumentNumber());
+                    c.setCustomerType(customer.getCustomerType());
+                    c.setCategory(customer.getCategory());
+                    return customerService.update(c);
+                }).map(customerUpdated -> ResponseEntity.created(URI.create("/api/productos/".concat(customerUpdated.getCustomerId())))
+                        .contentType(MediaType.APPLICATION_JSON_UTF8)
+                        .body(customerUpdated))
+                .defaultIfEmpty(ResponseEntity.notFound().build());
     }
-
     @DeleteMapping("/{id}")
-    public Mono<Void> delete(@PathVariable String id){
-        Mono<Void> customer = customerService.delete(id);
-        return customer;
+    public Mono<ResponseEntity<Void>> delete(@PathVariable String id){
+        return customerService.findById(id).flatMap(customer -> {
+            return customerService.delete(customer.getCustomerId()).then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT)));
+        }).defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
     }
 }
