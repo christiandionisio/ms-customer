@@ -40,6 +40,7 @@ public class CustomerController {
   String name;
   @Value("${server.port}")
   String port;
+
   private static final Logger logger = LogManager.getLogger(CustomerController.class);
 
   private ModelMapper modelMapper = new ModelMapper();
@@ -57,11 +58,6 @@ public class CustomerController {
    */
   @GetMapping
   public Mono<ResponseEntity<Flux<Customer>>> findAll() {
-    logger.debug("Debugging log");
-    logger.info("Info log");
-    logger.warn("Hey, This is a warning!");
-    logger.error("Oops! We have an Error. OK");
-    logger.fatal("Damn! Fatal error. Please fix me.");
     return Mono.just(
             ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON_UTF8)
@@ -93,7 +89,7 @@ public class CustomerController {
     modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
     return customerService.create(modelMapper.map(customerDto, Customer.class))
             .flatMap(c -> Mono.just(ResponseEntity.created(URI.create("http://localhost:8082/customers".concat("/").concat(c.getCustomerId())))
-                    .contentType(MediaType.APPLICATION_JSON)
+                    .contentType(MediaType.APPLICATION_JSON_UTF8)
                     .body(c)))
             .onErrorResume(e -> {
               if (e instanceof InvalidCustomerTypeException) {
