@@ -57,22 +57,6 @@ public class CustomerControllerTest {
   }
 
   @Test
-  @DisplayName("Read customer")
-  void read() {
-    Mockito.when(customerService.findById(Mockito.anyString()))
-            .thenReturn(Mono.just(CustomerProvider.getCustomer()));
-
-    webClient.get().uri("/customers/1")
-            .accept(MediaType.APPLICATION_JSON_UTF8)
-            .exchange()
-            .expectStatus().isOk()
-            .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
-            .expectBody()
-            .jsonPath("$.customerId").isNotEmpty()
-            .jsonPath("$.name").isEqualTo(CustomerProvider.getCustomer().getName());
-  }
-
-  @Test
   @DisplayName("Create customer")
   void create() {
     Mockito.when(customerService.create(Mockito.any(Customer.class)))
@@ -106,6 +90,22 @@ public class CustomerControllerTest {
             .body(Mono.just(CustomerProvider.getCustomerDto()), CustomerDto.class)
             .exchange()
             .expectStatus().is5xxServerError();
+  }
+
+  @Test
+  @DisplayName("Read customer")
+  void read() {
+    Mockito.when(customerService.findById(Mockito.anyString()))
+            .thenReturn(Mono.just(CustomerProvider.getCustomer()));
+
+    webClient.get().uri("/customers/1")
+            .accept(MediaType.APPLICATION_JSON_UTF8)
+            .exchange()
+            .expectStatus().isOk()
+            .expectHeader().contentType(MediaType.APPLICATION_JSON_UTF8)
+            .expectBody()
+            .jsonPath("$.customerId").isNotEmpty()
+            .jsonPath("$.name").isEqualTo(CustomerProvider.getCustomer().getName());
   }
 
   @Test
