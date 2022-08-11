@@ -1,5 +1,6 @@
 package com.example.mscustomer.service;
 
+import com.example.mscustomer.dto.AvailableProductsDto;
 import com.example.mscustomer.enums.CustomerTypeEnum;
 import com.example.mscustomer.error.InvalidCustomerTypeException;
 import com.example.mscustomer.model.Customer;
@@ -42,5 +43,10 @@ public class CustomerServiceImpl implements CustomerService {
   @Override
   public Mono<Void> delete(String id) {
     return customerDao.deleteById(id);
+  }
+
+  @Override
+  public Mono<AvailableProductsDto> getSummaryOfAvailableProductsByCustomer(String idCustomer) {
+    return null;
   }
 }
