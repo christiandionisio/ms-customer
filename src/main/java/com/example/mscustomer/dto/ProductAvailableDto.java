@@ -11,6 +11,6 @@ import lombok.NoArgsConstructor;
 @Builder
 public class ProductAvailableDto {
     private String productName;
-    private String productDescription;
     private String productCategory;
+    private String productDescription;
 }

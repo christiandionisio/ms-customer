@@ -12,3 +12,7 @@ server:
   port: 8082
 owner:
   name: Alisson
+
+account:
+  service:
+    uri: "http://localhost:8083/accounts/"

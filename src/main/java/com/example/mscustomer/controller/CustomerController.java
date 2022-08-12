@@ -140,4 +140,10 @@ public class CustomerController {
               .then(Mono.just(new ResponseEntity<Void>(HttpStatus.NO_CONTENT))))
             .defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
   }
+
+  @GetMapping("/getSummaryOfAvailableProductsByCustomer/{id}")
+    public Mono<ResponseEntity<Object>> getSummaryOfAvailableProductsByCustomer(@PathVariable String id) {
+        return customerService.getSummaryOfAvailableProductsByCustomer(id)
+                .flatMap(c -> Mono.just(ResponseEntity.ok().body(c)));
+    }
 }
