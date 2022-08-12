@@ -58,18 +58,33 @@ public class CustomerServiceImpl implements CustomerService {
     AvailableProductsDto availableProductsDto = new AvailableProductsDto();
     return customerDao.findById(idCustomer)
             .flatMap(customer -> validateAccountProductsForCustomerType(customer)
-                    .flatMap(productAvailableDto -> {
-                      availableProductsDto.setAccountProductDtoList(productAvailableDto);
-                      return Mono.just(availableProductsDto);
-                    })
+                    .flatMap(productAvailableDto ->
+                            setAvailableProductsAccount(availableProductsDto, productAvailableDto))
                     .flatMap(response -> validateCreditProductsForCustomerType(customer)
-                            .flatMap(productAvailableDto -> {
-                              availableProductsDto.setCreditProductDtoList(productAvailableDto);
-                              return Mono.just(availableProductsDto);
-                            })
+                            .flatMap(productAvailableDto ->
+                                    setAvailableProductsCredits(availableProductsDto, productAvailableDto))
                             .defaultIfEmpty(availableProductsDto)
                     )
+                    .flatMap(response -> validateCreditCardProductsForCustomerType(customer)
+                            .flatMap(productAvailableDto ->
+                                    setAvailableProductsCreditCard(availableProductsDto, productAvailableDto))
+                    )
             );
+  }
+
+  private Mono<AvailableProductsDto> setAvailableProductsAccount(AvailableProductsDto availableProductsDto, List<ProductAvailableDto> productAvailableDtoList) {
+    availableProductsDto.setAccountProductDtoList(productAvailableDtoList);
+    return Mono.just(availableProductsDto);
+  }
+
+  private Mono<AvailableProductsDto> setAvailableProductsCredits(AvailableProductsDto availableProductsDto, List<ProductAvailableDto> productAvailableDtoList) {
+    availableProductsDto.setCreditProductDtoList(productAvailableDtoList);
+    return Mono.just(availableProductsDto);
+  }
+
+  private Mono<AvailableProductsDto> setAvailableProductsCreditCard(AvailableProductsDto availableProductsDto, List<ProductAvailableDto> productAvailableDtoList) {
+    availableProductsDto.setCardProductDtoList(productAvailableDtoList);
+    return Mono.just(availableProductsDto);
   }
 
   public Mono<List<ProductAvailableDto>> validateAccountProductsForCustomerType(Customer customer) {
@@ -156,6 +171,32 @@ public class CustomerServiceImpl implements CustomerService {
                     .productName("CREDIT")
                     .productDescription("DISPONIBLE")
                     .productCategory("CREDIT PERSONAL")
+                    .build());
+    return productAvailableDtoList;
+  }
+
+  private Mono<List<ProductAvailableDto>> validateCreditCardProductsForCustomerType(Customer customer) {
+    return (customer.getCustomerType().equals(CustomerTypeEnum.BUSINESS.getValue()))
+            ? Mono.just(setCreditCardProductAvailableBusiness())
+            : Mono.just(setCreditCardProductAvailablePersonal());
+  }
+
+  private List<ProductAvailableDto> setCreditCardProductAvailablePersonal() {
+    List<ProductAvailableDto> productAvailableDtoList = new ArrayList<>();
+    productAvailableDtoList.add(ProductAvailableDto.builder()
+                    .productName("CREDIT CARD")
+                    .productDescription("DISPONIBLE")
+                    .productCategory("CREDIT CARD PERSONAL")
+                    .build());
+    return productAvailableDtoList;
+  }
+
+  private List<ProductAvailableDto> setCreditCardProductAvailableBusiness() {
+    List<ProductAvailableDto> productAvailableDtoList = new ArrayList<>();
+    productAvailableDtoList.add(ProductAvailableDto.builder()
+                    .productName("CREDIT CARD")
+                    .productDescription("DISPONIBLE")
+                    .productCategory("CREDIT CARD BUSINESS")
                     .build());
     return productAvailableDtoList;
   }
