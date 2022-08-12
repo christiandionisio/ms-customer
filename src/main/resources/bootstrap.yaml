@@ -16,3 +16,7 @@ owner:
 account:
   service:
     uri: "http://localhost:8083/accounts/"
+
+credit:
+    service:
+        uri: "http://localhost:8085/credits/"
