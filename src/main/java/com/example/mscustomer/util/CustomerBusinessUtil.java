@@ -2,6 +2,7 @@ package com.example.mscustomer.util;
 
 import com.example.mscustomer.dto.AccountDto;
 import com.example.mscustomer.dto.CreditDto;
+import com.example.mscustomer.error.PersonalCustomerNotHaveAnAccountException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -31,7 +32,8 @@ public class CustomerBusinessUtil {
                 .get()
                 .uri("/findByCustomerId/{id}", id)
                 .retrieve()
-                .onStatus(HttpStatus::isError, clientResponse -> Mono.empty())
+                .onStatus(HttpStatus::isError, clientResponse ->
+                        Mono.error(new PersonalCustomerNotHaveAnAccountException()))
                 .bodyToMono(CreditDto.class);
     }
 

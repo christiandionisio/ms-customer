@@ -136,7 +136,8 @@ public class CustomerServiceImpl implements CustomerService {
             .flatMap(creditDto -> (creditDto != null)
                     ? Mono.empty()
                     : Mono.just(setCreditProductAvailable())
-            );
+            )
+            .onErrorResume(throwable -> Mono.just(setCreditProductAvailable()));
   }
 
   private Mono<List<ProductAvailableDto>> validateCreditProductsForBusinessCustomer(Customer customer) {
