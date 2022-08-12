@@ -62,6 +62,13 @@ public class CustomerServiceImpl implements CustomerService {
                       availableProductsDto.setAccountProductDtoList(productAvailableDto);
                       return Mono.just(availableProductsDto);
                     })
+                    .flatMap(response -> validateCreditProductsForCustomerType(customer)
+                            .flatMap(productAvailableDto -> {
+                              availableProductsDto.setCreditProductDtoList(productAvailableDto);
+                              return Mono.just(availableProductsDto);
+                            })
+                            .defaultIfEmpty(availableProductsDto)
+                    )
             );
   }
 
@@ -85,7 +92,6 @@ public class CustomerServiceImpl implements CustomerService {
     Map<String, Boolean> accountsAvailable = new HashMap<>();
     return customerBusinessUtil.findByCustomerOwnerId(customer.getCustomerId())
             .map(accountResponse -> {
-              System.out.println("accountResponse: " + accountResponse);
               if (accountResponse.getAccountType().equals(AccountTypeEnum.SAVING_ACCOUNT.getValue())) {
                 accountsAvailable.put(AccountTypeEnum.SAVING_ACCOUNT.getValue(), false);
               } else if (accountResponse.getAccountType().equals(AccountTypeEnum.CURRENT_ACCOUNT.getValue())) {
@@ -100,16 +106,13 @@ public class CustomerServiceImpl implements CustomerService {
   }
 
   private List<ProductAvailableDto> setAccountsAvailable(Map<String, Boolean> accountsAvailable) {
-    System.out.println("accountsAvailable: " + accountsAvailable);
 
     for(AccountTypeEnum accountTypeEnum : AccountTypeEnum.values()) {
       accountsAvailable.putIfAbsent(accountTypeEnum.getValue(), true);
-      System.out.println("accountsAvailable: " + accountsAvailable);
     }
 
     List<ProductAvailableDto> productAvailableDtoList = new ArrayList<>();
     accountsAvailable.forEach((key, value) -> {
-      System.out.println("key: " + key + " value: " + value);
       if (Boolean.TRUE.equals(value)) {
         productAvailableDtoList.add(ProductAvailableDto.builder()
                 .productName("ACCOUNT")
@@ -119,6 +122,40 @@ public class CustomerServiceImpl implements CustomerService {
       }
     });
 
+    return productAvailableDtoList;
+  }
+
+  private Mono<List<ProductAvailableDto>> validateCreditProductsForCustomerType(Customer customer) {
+    return (customer.getCustomerType().equals(CustomerTypeEnum.BUSINESS.getValue()))
+            ? validateCreditProductsForBusinessCustomer(customer)
+            : validateCreditProductsForPersonalCustomer(customer);
+  }
+
+  private Mono<List<ProductAvailableDto>> validateCreditProductsForPersonalCustomer(Customer customer) {
+    return customerBusinessUtil.findCreditByCustomerId(customer.getCustomerId())
+            .flatMap(creditDto -> (creditDto != null)
+                    ? Mono.empty()
+                    : Mono.just(setCreditProductAvailable())
+            );
+  }
+
+  private Mono<List<ProductAvailableDto>> validateCreditProductsForBusinessCustomer(Customer customer) {
+    List<ProductAvailableDto> productAvailableDtoList = new ArrayList<>();
+    productAvailableDtoList.add(ProductAvailableDto.builder()
+                    .productName("CREDIT")
+                    .productDescription("DISPONIBLE")
+                    .productCategory("CREDIT BUSINESS")
+                    .build());
+    return Mono.just(productAvailableDtoList);
+  }
+
+  private List<ProductAvailableDto> setCreditProductAvailable() {
+    List<ProductAvailableDto> productAvailableDtoList = new ArrayList<>();
+    productAvailableDtoList.add(ProductAvailableDto.builder()
+                    .productName("CREDIT")
+                    .productDescription("DISPONIBLE")
+                    .productCategory("CREDIT PERSONAL")
+                    .build());
     return productAvailableDtoList;
   }
 }

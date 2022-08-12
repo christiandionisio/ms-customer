@@ -3,6 +3,7 @@ package com.example.mscustomer.util;
 import com.example.mscustomer.dto.AccountDto;
 import com.example.mscustomer.dto.CreditDto;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Flux;
@@ -30,6 +31,7 @@ public class CustomerBusinessUtil {
                 .get()
                 .uri("/findByCustomerId/{id}", id)
                 .retrieve()
+                .onStatus(HttpStatus::isError, clientResponse -> Mono.empty())
                 .bodyToMono(CreditDto.class);
     }
 
