@@ -1,5 +1,6 @@
 package com.example.mscustomer.controller;
 
+import com.example.mscustomer.dto.AvailableProductsDto;
 import com.example.mscustomer.dto.CustomerDto;
 import com.example.mscustomer.error.InvalidCustomerTypeException;
 import com.example.mscustomer.model.Customer;
@@ -135,5 +136,18 @@ public class CustomerControllerTest {
     webClient.delete().uri("/customers/1")
             .exchange()
             .expectStatus().isNoContent();
+  }
+
+  @Test
+  @DisplayName("Get summary of available products")
+  void getSummaryOfAvailableProductsByCustomerTest() {
+      Mockito.when(customerService.getSummaryOfAvailableProductsByCustomer(Mockito.anyString()))
+              .thenReturn(Mono.just(new AvailableProductsDto()));
+
+      webClient.get().uri("/customers/getSummaryOfAvailableProductsByCustomer/1")
+              .exchange()
+              .expectStatus().isOk()
+              .expectBody(AvailableProductsDto.class)
+              .isEqualTo(new AvailableProductsDto());
   }
 }
