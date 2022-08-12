@@ -141,6 +141,12 @@ public class CustomerController {
             .defaultIfEmpty(new ResponseEntity<Void>(HttpStatus.NOT_FOUND));
   }
 
+  /**
+   * Get summary of available products by customer ID
+   *
+   * @author Alisson Arteaga / Christian Dionisio
+   * @version 1.0
+   */
   @GetMapping("/getSummaryOfAvailableProductsByCustomer/{id}")
     public Mono<ResponseEntity<Object>> getSummaryOfAvailableProductsByCustomer(@PathVariable String id) {
         return customerService.getSummaryOfAvailableProductsByCustomer(id)
