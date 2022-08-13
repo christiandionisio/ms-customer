@@ -7,7 +7,7 @@ spring:
   cloud:
     config:
       name: ms-customer
-      uri: http://localhost:8081
+      uri: https://bootcamp-ms-config-server-g3.azurewebsites.net/
 server:
   port: 8082
 owner:
