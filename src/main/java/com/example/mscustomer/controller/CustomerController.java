@@ -5,6 +5,11 @@ import com.example.mscustomer.error.InvalidCustomerTypeException;
 import com.example.mscustomer.model.Customer;
 import com.example.mscustomer.service.CustomerService;
 import java.net.URI;
+
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.modelmapper.ModelMapper;
@@ -31,6 +36,7 @@ import reactor.core.publisher.Mono;
  * @author Alisson Arteaga / Christian Dionisio
  * @version 1.0
  */
+@Api(value = "Customer Rest Controller", description = "REST API for Customers")
 @RestController
 @RequestMapping("/customers")
 public class CustomerController {
@@ -56,6 +62,12 @@ public class CustomerController {
    * @author Alisson Arteaga / Christian Dionisio
    * @version 1.0
    */
+  @ApiOperation(value = "Get Customer ", response = Customer.class, tags = "getCustomers")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success|OK"),
+          @ApiResponse(code = 401, message = "Not Authorized!"),
+          @ApiResponse(code = 403, message = "Forbidden!"),
+          @ApiResponse(code = 404, message = "Not Found!") })
   @GetMapping
   public Mono<ResponseEntity<Flux<Customer>>> findAll() {
     return Mono.just(
@@ -70,6 +82,12 @@ public class CustomerController {
    * @author Alisson Arteaga / Christian Dionisio
    * @version 1.0
    */
+  @ApiOperation(value = "Create Customer ", response = Customer.class, tags = "createCustomer")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success|OK"),
+          @ApiResponse(code = 401, message = "Not Authorized!"),
+          @ApiResponse(code = 403, message = "Forbidden!"),
+          @ApiResponse(code = 404, message = "Not Found!") })
   @PostMapping
   public Mono<ResponseEntity<Customer>> create(@RequestBody CustomerDto customerDto) {
     modelMapper.getConfiguration().setMatchingStrategy(MatchingStrategies.STRICT);
@@ -94,6 +112,12 @@ public class CustomerController {
    * @author Alisson Arteaga / Christian Dionisio
    * @version 1.0
    */
+  @ApiOperation(value = "Get Customer by Id ", response = Customer.class, tags = "getCustomerById")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success|OK"),
+          @ApiResponse(code = 401, message = "Not Authorized!"),
+          @ApiResponse(code = 403, message = "Forbidden!"),
+          @ApiResponse(code = 404, message = "Not Found!") })
   @GetMapping("/{id}")
   public Mono<ResponseEntity<Customer>> read(@PathVariable String id) {
     return customerService.findById(id).map(customer -> ResponseEntity.ok()
@@ -108,6 +132,12 @@ public class CustomerController {
    * @author Alisson Arteaga / Christian Dionisio
    * @version 1.0
    */
+  @ApiOperation(value = "Update Customer ", response = Customer.class, tags = "updateCustomer")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success|OK"),
+          @ApiResponse(code = 401, message = "Not Authorized!"),
+          @ApiResponse(code = 403, message = "Forbidden!"),
+          @ApiResponse(code = 404, message = "Not Found!") })
   @PutMapping("/{id}")
   public Mono<ResponseEntity<Customer>> update(@RequestBody CustomerDto customerDto,
                                                @PathVariable String id) {
@@ -133,6 +163,12 @@ public class CustomerController {
    * @author Alisson Arteaga / Christian Dionisio
    * @version 1.0
    */
+  @ApiOperation(value = "Delete Customer ", response = Customer.class, tags = "deleteCustomer")
+  @ApiResponses(value = {
+          @ApiResponse(code = 200, message = "Success|OK"),
+          @ApiResponse(code = 401, message = "Not Authorized!"),
+          @ApiResponse(code = 403, message = "Forbidden!"),
+          @ApiResponse(code = 404, message = "Not Found!") })
   @DeleteMapping("/{id}")
   public Mono<ResponseEntity<Void>> delete(@PathVariable String id) {
     return customerService.findById(id)
